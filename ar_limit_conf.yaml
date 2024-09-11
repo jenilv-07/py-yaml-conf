@@ -1,0 +1,17 @@
+active-response:
+  custom-limit:
+    ar-trigger0: 300
+    block-domain0: 50
+    blockusb0: 200
+    full-scan0: 300
+    isolation0: 10
+    offboard0: 200
+    quick-scan0: 15
+    remove-threat0: 300
+    restart-ossec0: 300
+    restart-wazuh0: 300
+    run-livequery0: 300
+    unblock-domain0: 300
+    unblockusb0: 300
+    unisolation0: 300
+  global-limit: 300
