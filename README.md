@@ -1,7 +1,3 @@
-Here’s the updated documentation with emojis for a more engaging presentation:
-
----
-
 # 🛠️ ActiveResponseManager
 
 ## 🚀 Overview
@@ -142,7 +138,3 @@ Feel free to submit issues, fork the repository, and make pull requests to impro
 ## 📜 License
 
 This project is licensed under the MIT License.
-
----
-
-This version includes emojis to make the documentation more visually engaging and fun! It maintains clarity while adding a bit of personality to the project presentation.
