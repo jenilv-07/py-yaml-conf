@@ -157,20 +157,27 @@ class ActiveResponseManager:
         except Exception as e:
             print(f"An error occurred while updating the global limit: {e}")
 
+    def get_global_limit(self):
+        """
+        Retrieves the global limit from the YAML file.
+
+        Returns:
+            int: The global limit value.
+        """
+        try:
+            return self.yaml_data['active-response']['global-limit']
+        except KeyError:
+            print("Global limit not found in YAML file.")
+            return None
+
+# Example usage of the new method
 try:
     manager = ActiveResponseManager()
 
-    manager.update_global_limit(300)
-
-    new_limits = {
-        'block-domain0': 50,
-        'quick-scan0': 15,
-        'new-command0': 100
-    }
-    manager.update_command_limits(new_limits)
-
-    updated_limits = manager.get_limits()
-    print("Updated Limits:", updated_limits)
+    global_limit = manager.get_global_limit()
+    all = manager.get_limits()
+    print("Global Limit:", global_limit)
+    print("all:", all)
 
 except Exception as e:
     print(f"An unexpected error occurred in the main execution: {e}")

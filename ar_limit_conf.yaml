@@ -7,11 +7,11 @@ active-response:
     isolation0: 10
     offboard0: 200
     quick-scan0: 15
-    remove-threat0: 300
+    remove-threat0: null
     restart-ossec0: 300
-    restart-wazuh0: 300
+    restart-wazuh0: null
     run-livequery0: 300
     unblock-domain0: 300
-    unblockusb0: 300
+    unblockusb0: null
     unisolation0: 300
   global-limit: 300
