@@ -6,7 +6,7 @@ active-response:
     full-scan0: 300
     isolation0: 10
     offboard0: 200
-    quick-scan0: 15
+    quick-scan0: null
     remove-threat0: null
     restart-ossec0: 300
     restart-wazuh0: null
