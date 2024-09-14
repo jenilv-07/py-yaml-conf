@@ -192,7 +192,157 @@ class ActiveResponseLimit:
             logger.error("Global limit not found in YAML file.")
             return None
         
-        
-data = ActiveResponseLimit()
+    def get_custom_limits_with_global(self):
+        """
+        Retrieves the custom limits and the global limit from the YAML file in the required format.
+        This method constructs a dictionary containing both the custom limits for specific commands
+        and the global limit that applies to all commands.
 
-print(data.update_command_limits({"quick-scan0":4000}))
+        Returns:
+            dict: A dictionary containing:
+                - "Custom-limit" (dict): The custom limits for each command where keys are command names 
+                and values are the respective limits. Commands with no set limit are represented as `None`.
+                - "global-limit" (dict): A dictionary with a single key "global-limit" representing the overall 
+                global limit applied across all commands.
+                
+        Raises:
+            Exception: If there is an issue retrieving the custom limits or the global limit, an exception is caught, 
+            logged, and an empty dictionary is returned.
+
+        Example:
+            >>> ar_manager = ActiveResponseLimit()
+            >>> limits = ar_manager.get_custom_limits_with_global()
+            >>> print(limits)
+        """
+        try:
+            # Retrieve custom limits from YAML file
+            custom_limits = self.yaml_data.get('active-response', {}).get('custom-limit', {})
+            # Retrieve the global limit using the existing function
+            global_limit = self.get_global_limit()
+
+            # Construct the formatted data with custom limits and global limit
+            formatted_data = {
+                "Custom-limit": custom_limits,
+                "global-limit": {
+                    "global-limit": global_limit
+                }
+            }
+
+            # Return the formatted data
+            return formatted_data
+
+        except Exception as e:
+            # Log any error encountered and return an empty dictionary
+            logger.error(f"An error occurred while retrieving custom limits and global limit: {e}")
+            return {}
+
+    def update_custom_limits_and_global(self, limits_dict):
+        """
+        Updates the custom limits and the global limit in the YAML file. This method allows you to provide a 
+        dictionary that contains both the custom limits and the global limit.
+
+        Args:
+            limits_dict (dict): A dictionary that should have the following structure:
+                {
+                    'Custom-limit': {
+                        'ar-trigger0': 150,
+                        'block-domain0': None,
+                        ...
+                    },
+                    'global-limit': {
+                        'global-limit': 150
+                    }
+                }
+
+        Returns:
+            bool: True if the update was successful, False otherwise.
+
+        Raises:
+            Exception: If there is an issue updating the limits, it logs the error and returns False.
+
+        Example:
+            >>> ar_manager = ActiveResponseLimit()
+            >>> limits = {
+            >>>     'Custom-limit': {
+            >>>         'ar-trigger0': 150,
+            >>>         'block-domain0': None,
+            >>>         ...
+            >>>     },
+            >>>     'global-limit': {
+            >>>         'global-limit': 150
+            >>>     }
+            >>> }
+            >>> success = ar_manager.update_custom_limits_and_global(limits)
+            >>> if success:
+            >>>     print("Limits updated successfully")
+        """
+        try:
+            # Retrieve current custom limits from YAML file
+            custom_limits = self.yaml_data.get('active-response', {}).get('custom-limit', {})
+
+            old_global_limit = self.get_global_limit()
+            
+            # Get new custom limits from the passed limits_dict
+            new_custom_limits = limits_dict.get('Custom-limit', {})
+            new_global_limit = limits_dict.get('global-limit', {}).get('global-limit')
+
+            # Update custom limits
+            for command, limit in new_custom_limits.items():
+                if limit is not None:
+                    if limit < new_global_limit:
+                        custom_limits[command] = limit
+                    else:
+                        custom_limits[command] = new_global_limit
+                else:
+                    custom_limits[command] = None  # Store None as null in YAML
+
+            # Set updated custom limits in the YAML structure
+            self.yaml_data['active-response']['custom-limit'] = custom_limits
+
+            # Update the global limit if provided
+            if new_global_limit is not None and new_global_limit > 0:
+                self.yaml_data['active-response']['global-limit'] = new_global_limit
+                logger.debug(f"Updated global limit to: {new_global_limit}")
+
+            # Write the updated YAML data back to the file
+            self.write_yaml()
+            return True
+
+        except Exception as e:
+            logger.error(f"An error occurred while updating the custom limits and global limit: {e}")
+            return False
+
+        
+ar_manager = ActiveResponseLimit()
+
+# The input dictionary to update limits
+limits = {
+    'Custom-limit': {
+        'ar-trigger0': None,
+        'block-domain0': None,
+        'blockusb0': None,
+        'full-scan0': None,
+        'isolation0': 234,
+        'offboard0': None,
+        'quick-scan0': None,
+        'remove-threat0': None,
+        'restart-ossec0': None,
+        'restart-wazuh0': None,
+        'run-livequery0': None,
+        'unblock-domain0': None,
+        'unblockusb0': None,
+        'unisolation0': None
+    },
+    'global-limit': {
+        'global-limit': 100
+    }
+}
+
+# Update the limits
+success = ar_manager.update_custom_limits_and_global(limits)
+
+# Check if the update was successful
+if success:
+    print("Limits updated successfully")
+else:
+    print("Failed to update limits")
